@@ -1,5 +1,7 @@
 # Vilanova
 
+DISCLAIMER: This library is still at early development, so use it at your own risk!
+
 `JSON` stringify and parse where transformations for types can be defined in a pluggable way in Node.js.
 
 By default, it is able to stringify and parse objects that contains `BigInt` numbers.
@@ -53,8 +55,10 @@ The replacer is the way to create the target object from the string.
 Example:
 
 ```javascript
-Vilanova.addType('bigint', value => `#BigInt:${value}`, value => BigInt(value));
+Vilanova.addType('BigInt', value => `#BigInt:${value}`, value => BigInt(value));
 ```
+
+Also, you must rewrite the `Vilanova.getType` method to recognize the type. The type recognition is done in one function instead of a function per type due to performance, so only one function is launched to recognize the type given a value.
 
 ## Contributing
 

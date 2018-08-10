@@ -10,8 +10,8 @@ function generateStep(i, circular = false) {
   if (circular) {
     obj.ref = obj;
   }
-  const str = circular ? `{"id":${i},"name":"name ${i}","bigValue":"#bigint:${obj.bigValue}","ref":"~${i}"}`
-    : `{"id":${i},"name":"name ${i}","bigValue":"#bigint:${obj.bigValue}"}`;
+  const str = circular ? `{"id":${i},"name":"name ${i}","bigValue":"#BigInt:${obj.bigValue}","ref":"~${i}"}`
+    : `{"id":${i},"name":"name ${i}","bigValue":"#BigInt:${obj.bigValue}"}`;
   return { obj, str };
 }
 
@@ -36,7 +36,7 @@ describe('Vilanova', () => {
   describe('Stringify', () => {
     test('It should stringify a BigInt', () => {
       const input = BigInt('123456789012345678901234567890');
-      const expected = '"#bigint:123456789012345678901234567890"';
+      const expected = '"#BigInt:123456789012345678901234567890"';
       const actual = Vilanova.stringify(input);
       expect(actual).toEqual(expected);
     });
@@ -54,6 +54,12 @@ describe('Vilanova', () => {
       const testcase = generateTestcase(100, true);
       const actual = Vilanova.stringify(testcase.obj, CircularJSON.stringify);
       expect(actual).toEqual(testcase.str);
+    });
+    test('It should escape strings starting with tokens of existing types', () => {
+      const input = '#BigInt:1234';
+      const actual = Vilanova.stringify(input);
+      const expected = '"#String:#BigInt:1234"';
+      expect(actual).toEqual(expected);
     });
   });
 
@@ -77,20 +83,20 @@ describe('Vilanova', () => {
       expect(actual).toEqual(expected);
     });
     test('It should return the source if does not start with #', () => {
-      const input = 'bigint:123456';
+      const input = 'BigInt:123456';
       const expected = { type: undefined, value: input };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
     test('It should return the source if does not contains :', () => {
-      const input = '#bigint.123456';
+      const input = '#BigInt.123456';
       const expected = { type: undefined, value: input };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
     test('It should pop the type if the format is correct', () => {
-      const input = '#bigint:123456';
-      const expected = { type: 'bigint', value: '123456' };
+      const input = '#BigInt:123456';
+      const expected = { type: 'BigInt', value: '123456' };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
@@ -98,7 +104,7 @@ describe('Vilanova', () => {
 
   describe('Parse', () => {
     test('It should parse a BigInt', () => {
-      const input = '"#bigint:123456789012345678901234567890"';
+      const input = '"#BigInt:123456789012345678901234567890"';
       const expected = BigInt('123456789012345678901234567890');
       const actual = Vilanova.parse(input);
       expect(actual).toEqual(expected);
@@ -124,6 +130,11 @@ describe('Vilanova', () => {
       const actual = Vilanova.parse(testcase.str, CircularJSON.parse);
       expect(actual).toEqual(testcase.obj);
     });
+    test('It should parse escaped strings', () => {
+      const input = '"#String:#BigInt:1234"';
+      const expected = '#BigInt:1234';
+      const actual = Vilanova.parse(input);
+      expect(actual).toEqual(expected);
+    });
   });
-
 });
