@@ -1,22 +1,30 @@
 const Vilanova = require('../lib');
+const CircularJSON = require('circular-json'); 
 
-function generateStep(i) {
+function generateStep(i, circular = false) {
   const obj = {
     id: i,
     name: `name ${i}`,
     bigValue: BigInt('1000000000000000000000000000000') + BigInt(`${i}`),
   };
-  const str = `{"id":${i},"name":"name ${i}","bigValue":"#BigInt:${obj.bigValue}"}`;
+  if (circular) {
+    obj.ref = obj;
+  }
+  const str = circular ? `{"id":${i},"name":"name ${i}","bigValue":"#bigint:${obj.bigValue}","ref":"~${i}"}`
+    : `{"id":${i},"name":"name ${i}","bigValue":"#bigint:${obj.bigValue}"}`;
   return { obj, str };
 }
 
-function generateTestcase(numElements) {
+function generateTestcase(numElements, circular = false) {
   if (!numElements) {
     return generateStep(1);
   }
   const result = { obj: [], str: '' };
   for (let i = 0; i < numElements; i += 1) {
-    const step = generateStep(i);
+    const step = generateStep(i, circular);
+    if (circular) {
+      step.obj.ref = step.obj;
+    }
     result.obj.push(step.obj);
     result.str = i > 0 ? `${result.str},${step.str}` : `[${step.str}`;
   }
@@ -28,7 +36,7 @@ describe('Vilanova', () => {
   describe('Stringify', () => {
     test('It should stringify a BigInt', () => {
       const input = BigInt('123456789012345678901234567890');
-      const expected = '"#BigInt:123456789012345678901234567890"';
+      const expected = '"#bigint:123456789012345678901234567890"';
       const actual = Vilanova.stringify(input);
       expect(actual).toEqual(expected);
     });
@@ -40,6 +48,11 @@ describe('Vilanova', () => {
     test('It should strinfigy an array of objects', () => {
       const testcase = generateTestcase(100);
       const actual = Vilanova.stringify(testcase.obj);
+      expect(actual).toEqual(testcase.str);
+    });
+    test('It should allow to pass a custom stringify function', () => {
+      const testcase = generateTestcase(100, true);
+      const actual = Vilanova.stringify(testcase.obj, CircularJSON.stringify);
       expect(actual).toEqual(testcase.str);
     });
   });
@@ -64,20 +77,20 @@ describe('Vilanova', () => {
       expect(actual).toEqual(expected);
     });
     test('It should return the source if does not start with #', () => {
-      const input = 'BigInt:123456';
+      const input = 'bigint:123456';
       const expected = { type: undefined, value: input };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
     test('It should return the source if does not contains :', () => {
-      const input = '#BigInt.123456';
+      const input = '#bigint.123456';
       const expected = { type: undefined, value: input };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
     test('It should pop the type if the format is correct', () => {
-      const input = '#BigInt:123456';
-      const expected = { type: 'BigInt', value: '123456' };
+      const input = '#bigint:123456';
+      const expected = { type: 'bigint', value: '123456' };
       const actual = Vilanova.getToken(input);
       expect(actual).toEqual(expected);
     });
@@ -85,7 +98,7 @@ describe('Vilanova', () => {
 
   describe('Parse', () => {
     test('It should parse a BigInt', () => {
-      const input = '"#BigInt:123456789012345678901234567890"';
+      const input = '"#bigint:123456789012345678901234567890"';
       const expected = BigInt('123456789012345678901234567890');
       const actual = Vilanova.parse(input);
       expect(actual).toEqual(expected);
@@ -106,5 +119,11 @@ describe('Vilanova', () => {
       const actual = Vilanova.parse(testcase.str);
       expect(actual).toEqual(testcase.obj);
     });
+    test('It should allow to pass a custom parse function', () => {
+      const testcase = generateTestcase(100, true);
+      const actual = Vilanova.parse(testcase.str, CircularJSON.parse);
+      expect(actual).toEqual(testcase.obj);
+    });
   });
+
 });

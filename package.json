@@ -1,7 +1,7 @@
 {
   "name": "vilanova",
   "description": "JSON stringify/parse pluggable library with support for BigInt",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": "lib/index.js",
   "keywords": [
     "JSON",
@@ -39,6 +39,7 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
+    "circular-json": "^0.5.5",
     "eslint": "^4.10.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",

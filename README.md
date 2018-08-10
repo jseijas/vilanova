@@ -8,6 +8,7 @@ By default, it is able to stringify and parse objects that contains `BigInt` num
 
 * [Installation](#installation)
 * [Example of use](#example-of-use)
+* [Using CircularJSON](#using-circularjson)
 * [Adding custom types](#adding-custom-types)
 * [Contributing](#contributing)
 * [Code of Conduct](#code-of-conduct)
@@ -29,6 +30,20 @@ const obj = { id: 1, name: 'name', value: 123456789012345678901234567890n };
 const str = Vilanova.stringify(obj);
 const newObj = Vilanova.parse(str);
 ```
+
+## Using CircularJSON
+
+Vilanova allows you to use your own stringify and parse functions. One of the most used is CircularJSON.
+
+```javascript
+const CircularJSON = require('circular-json');
+const Vilanova = require('vilanova');
+
+const obj = { id: 1, name: 'name', value: 123456789012345678901234567890n };
+const str = Vilanova.stringify(obj, CircularJSON.strinfigy);
+const newObj = Vilanova.parse(str, CircularJSON.parse);
+```
+
 
 ## Adding custom types
 
