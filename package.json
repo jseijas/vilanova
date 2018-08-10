@@ -1,0 +1,56 @@
+{
+  "name": "vilanova",
+  "description": "JSON stringify/parse pluggable library with support for BigInt",
+  "version": "0.0.1",
+  "main": "lib/index.js",
+  "keywords": [
+    "JSON",
+    "stringify",
+    "parse",
+    "bigint",
+    "replacer",
+    "reviver"
+  ],
+  "engines": {
+    "node": ">=10.4.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "lintfix": "eslint --fix lib/**",
+    "test": "eslint lib/** && jest --coverage"
+  },
+  "author": {
+    "email": "jseijas@gmail.com",
+    "name": "Jesus Seijas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jseijas/vilanova.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jseijas/vilanova/issues"
+  },
+  "maintainers": [
+    {
+      "email": "jseijas@gmail.com",
+      "name": "Jesus Seijas"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.20.2",
+    "jest": "^23.5.0"
+  },
+  "jest": {
+    "verbose": true,
+    "testURL": "http://localhost/",
+    "collectCoverageFrom": [
+      "lib/**.js"
+    ],
+    "coverageDirectory": "coverage"
+  }
+}
